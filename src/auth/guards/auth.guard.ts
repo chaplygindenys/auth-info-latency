@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class AccTokGuard extends AuthGuard('jwt') {
+export class TokGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     super();
   }
