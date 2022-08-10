@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    container_name: app
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - ${APP_PORT}:${PORT}
+    networks:
+      - custom-network
+    volumes:
+      - ./logger:/app/logger
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+
+  postgres:
+    build:
+      context: ./db
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER:${POSTGRES_USER}
+      - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
+      - POSTGRES_DB:${POSTGRES_DB}
+      - PGDATA:${PGDATA}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_DEFAULT_PORT}
+    networks:
+      - custom-network
+    volumes:
+      - ./pg_data:${PGDATA}
+
+networks:
+  custom-network:
+    name: custom-network
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
