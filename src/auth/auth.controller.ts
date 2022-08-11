@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
   HttpStatus,
@@ -53,16 +54,25 @@ export class AuthController {
     return resalt;
   }
 
-  @Post('logout')
+  @Get('logout')
   @HttpCode(HttpStatus.OK)
   async logout(
     @Query() params: QueryLogoutDto,
     @GetCurrentUserId() userId: string,
   ) {
-    if (params.all) {
+    if (params.all === 'true') {
       await this.authService.logoutAll();
-    } else {
+
+      return Message.LOGOUT_ALL;
+    } else if (params.all === 'false') {
       await this.authService.logoutById(userId);
+
+      return Message.LOGOUT_BY_ID;
+    } else {
+      throw new HttpException(
+        Message.MESSAGE_BAD_QUERY,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }
