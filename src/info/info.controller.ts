@@ -32,4 +32,16 @@ export class InfoController {
     }
     return latencyInfo;
   }
+  @Get('ping')
+  @HttpCode(HttpStatus.OK)
+  async ping(): Promise<string> {
+    const pingInfo = await this.infoService.pingInfo();
+    if (!pingInfo) {
+      throw new HttpException(
+        'INTERNAL_SERVER_ERROR',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return pingInfo;
+  }
 }

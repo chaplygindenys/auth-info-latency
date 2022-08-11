@@ -1,11 +1,8 @@
 import 'dotenv/config';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import util from 'util';
-import { createRequire } from 'module';
-import { cwd } from 'process';
-import { join } from 'path';
 import { exec } from 'child_process';
+import * as ping from 'ping';
 
 @Injectable()
 export class InfoService {
@@ -23,24 +20,40 @@ export class InfoService {
     }
   }
 
-  async latencyInfo(): Promise<string> {
+  async pingInfo(): Promise<string> {
     try {
       const lacety: Promise<string> = new Promise((res, rej) => {
-        exec(`ping -c 5 ${process.env.PING_HOST}`, (error, stdout, stderr) => {
-          if (error) {
-            rej(error);
-            return;
-          }
-          if (stdout) {
-            res(stdout);
-          } else if (stderr) {
-            rej(stderr);
-          }
-        });
+        exec(
+          `ping -c ${process.env.PING_NUMBER} ${process.env.PING_HOST}`,
+          (error, stdout, stderr) => {
+            if (error) {
+              rej(error);
+              return;
+            }
+            if (stdout) {
+              res(stdout);
+            } else if (stderr) {
+              rej(stderr);
+            }
+          },
+        );
       });
       const resalt = await lacety;
 
       return resalt;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  async latencyInfo(): Promise<string> {
+    try {
+      const lacety: Promise<ping.PingResponse> = ping.promise.probe(
+        process.env.PING_HOST,
+      );
+      const resalt = await lacety;
+      return resalt.avg;
     } catch (error) {
       console.log(error);
       return null;
