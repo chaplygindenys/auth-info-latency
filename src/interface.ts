@@ -6,3 +6,9 @@ interface User {
   createdAt: number; // timestamp of creation
   updatedAt: number; // timestamp of last update
 }
+
+interface UserIdInfo {
+  id: string; // string
+
+  id_type: string;
+}
