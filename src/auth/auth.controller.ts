@@ -5,11 +5,12 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
 } from '@nestjs/common';
 import { Message } from './auth-message';
 import { AuthService } from './auth.service';
 import { GetCurrentUserId, Public } from './decorators';
-import { AuthDto } from './dto';
+import { AuthDto, QueryLogoutDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +37,14 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@GetCurrentUserId() userId: string) {
-    await this.authService.logoutById(userId);
+  async logout(
+    @Query() params: QueryLogoutDto,
+    @GetCurrentUserId() userId: string,
+  ) {
+    if (params.all) {
+      await this.authService.logoutAll();
+    } else {
+      await this.authService.logoutById(userId);
+    }
   }
 }
