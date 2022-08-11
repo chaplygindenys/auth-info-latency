@@ -1,21 +1,11 @@
-import {
-  isEmail,
-  isMobilePhone,
-  IsNotEmpty,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { Message } from '../auth-message';
 
 export class AuthDto {
-  @IsNotEmpty({ message: 'emptry' })
-  @IsString({ message: 'string' })
-  @ValidateIf(
-    (obj: AuthDto) =>
-      isEmail(obj.id) || isMobilePhone(obj.id, process.env.LOCATE),
-    {
-      message: 'pho',
-    },
-  )
+  @IsString({
+    message: Message.MESSAGE_BAD_REQUEST,
+  })
+  @IsNotEmpty()
   id: string;
 
   @IsString()
