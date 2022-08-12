@@ -54,11 +54,11 @@ $ npm run test
 # Endpoints
 
 GET:
-/info
-/latency
-/logout
+/info set headers : `Authorization : Bearer {{accesshToken}}`
+/latency set headers : `Authorization : Bearer {{accesshToken}}`
+/logout set Query: `?all=true`or `?all=false` set headers : `Authorization : Bearer {{accesshToken}}`
 
 POST:
 /signup
 /signin
-/refresh
+/refresh set headers : `Authorization : Bearer {{refreshToken}}`
