@@ -2,7 +2,7 @@
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "hashPsw" TEXT NOT NULL,
-    "hashToken" TEXT,
+    "hashRefreshToken" TEXT,
     "id_type" TEXT NOT NULL,
     "version" INTEGER NOT NULL,
     "createdAt" INTEGER NOT NULL,
