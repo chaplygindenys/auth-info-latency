@@ -60,5 +60,7 @@ GET:
 
 POST:
 /signup
+set body: `{ "id":"+380677777775", "password":"password" }`
 /signin
+set body: `{ "id":"+380677777775", "password":"password" }`
 /refresh set headers : `Authorization : Bearer {{refreshToken}}`
