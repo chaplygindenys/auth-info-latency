@@ -6,5 +6,6 @@ export const infoRoutes = {
 export const authRoutes = {
   signup: '/signup',
   signin: '/signin',
-  refresh: '/logout',
+  logout: '/logout',
+  refresh: '/refresh',
 };

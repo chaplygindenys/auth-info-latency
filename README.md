@@ -50,3 +50,15 @@ $ npm run start:dev
 # unit tests
 $ npm run test
 ```
+
+# Endpoints
+
+GET:
+/info
+/latency
+/logout
+
+POST:
+/signup
+/signin
+/refresh
