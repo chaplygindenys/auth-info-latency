@@ -22,7 +22,7 @@ export class InfoController {
 
   @Get('latency')
   @HttpCode(HttpStatus.OK)
-  async lacety(): Promise<string> {
+  async lacety(): Promise<Latency> {
     const latencyInfo = await this.infoService.latencyInfo();
     if (!latencyInfo) {
       throw new HttpException(

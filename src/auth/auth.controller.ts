@@ -40,7 +40,7 @@ export class AuthController {
   @Public()
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: AuthDto): Promise<string> {
+  async login(@Body() dto: AuthDto): Promise<Token> {
     const resalt = await this.authService.signin(dto);
     if (resalt === process.env.BAD_REQUEST) {
       throw new HttpException(
@@ -51,7 +51,7 @@ export class AuthController {
     if (resalt === process.env.FORBIDDEN) {
       throw new HttpException(Message.MESSAGE_FORBIDDEN, HttpStatus.FORBIDDEN);
     }
-    return resalt;
+    return { token: resalt };
   }
 
   @Get('logout')

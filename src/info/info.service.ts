@@ -47,13 +47,14 @@ export class InfoService {
     }
   }
 
-  async latencyInfo(): Promise<string> {
+  async latencyInfo(): Promise<Latency> {
     try {
-      const lacety: Promise<ping.PingResponse> = ping.promise.probe(
+      const promisePingInfo: Promise<ping.PingResponse> = ping.promise.probe(
         process.env.PING_HOST,
       );
-      const resalt = await lacety;
-      return resalt.avg;
+      const pingInfo = await promisePingInfo;
+      const latencyInfo = { latency: pingInfo.avg };
+      return latencyInfo;
     } catch (error) {
       console.log(error);
       return null;

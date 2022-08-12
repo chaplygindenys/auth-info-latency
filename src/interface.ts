@@ -9,6 +9,11 @@ interface User {
 
 interface UserIdInfo {
   id: string; // string
-
   id_type: string;
+}
+interface Latency {
+  latency: string; // string
+}
+interface Token {
+  token: string; // string
 }
