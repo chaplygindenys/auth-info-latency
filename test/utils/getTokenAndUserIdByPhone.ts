@@ -18,7 +18,7 @@ const getTokenAndUserIdByPhone = async (request) => {
     .set('Accept', 'application/json')
     .send(createPhoneUserDto);
 
-  const token = `Bearer ${response2.body.token}`;
+  const token = `Bearer ${response2.body.accessToken}`;
 
   return { token };
 };

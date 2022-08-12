@@ -17,7 +17,7 @@ const getTokenAndUserIdByEmail = async (request) => {
     .set('Accept', 'application/json')
     .send(createEmailUserDto);
 
-  const token = `Bearer ${response2.body.token}`;
+  const token = `Bearer ${response2.body.accessToken}`;
 
   return { token };
 };

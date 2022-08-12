@@ -5,6 +5,7 @@ import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { isEmail, isMobilePhone } from 'class-validator';
+import { Message } from './auth-message';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     return null;
   }
 
-  async singup(dto: AuthDto): Promise<string> {
+  async singup(dto: AuthDto): Promise<Tokens | string> {
     try {
       const type: string = await this.validateTypeId(dto.id);
       if (!type) return process.env.BAD_REQUEST;
@@ -27,7 +28,7 @@ export class AuthService {
       if (user) return process.env.FORBIDDEN;
 
       const hashPsw = await this.hashData(dto.password);
-      const newUser = await this.prisma.user.create({
+      await this.prisma.user.create({
         data: {
           id: dto.id,
           hashPsw,
@@ -38,13 +39,13 @@ export class AuthService {
         },
       });
 
-      const token = await this.getToken(newUser.id);
-      await this.updateHashToken(newUser.id, token);
-      return token;
-    } catch (error) {}
+      return Message.AUTH_MESSAGE;
+    } catch (error) {
+      return process.env.INTERNAL_SERVER_ERROR;
+    }
   }
 
-  async signin(dto: AuthDto): Promise<string> {
+  async signin(dto: AuthDto): Promise<Tokens | string> {
     try {
       const type: string = await this.validateTypeId(dto.id);
       if (!type) return process.env.BAD_REQUEST;
@@ -57,24 +58,25 @@ export class AuthService {
       const passwordMatches = await bcrypt.compare(dto.password, user.hashPsw);
       if (!passwordMatches) return process.env.FORBIDDEN;
 
-      const token = await this.getToken(user.id);
-      await this.updateHashToken(user.id, token);
-      return token;
+      const tokens = await this.getTokens(user.id);
+      await this.updateHashRefreshToken(user.id, tokens.refreshToken);
+
+      return tokens;
     } catch (error) {
       if (error.message === process.env.FORBIDDEN) return process.env.FORBIDDEN;
-      return null;
+      return process.env.INTERNAL_SERVER_ERROR;
     }
   }
 
   async logoutAll() {
     await this.prisma.user.updateMany({
       where: {
-        hashToken: {
+        hashRefreshToken: {
           not: null,
         },
       },
       data: {
-        hashToken: null,
+        hashRefreshToken: null,
       },
     });
   }
@@ -83,14 +85,33 @@ export class AuthService {
     await this.prisma.user.updateMany({
       where: {
         id: userId,
-        hashToken: {
+        hashRefreshToken: {
           not: null,
         },
       },
       data: {
-        hashToken: null,
+        hashRefreshToken: null,
       },
     });
+  }
+
+  async refreshTokens(userId: string, refTok: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user || !user.hashRefreshToken) return process.env.FORBIDDEN;
+
+      const refTokMatches = await bcrypt.compare(refTok, user.hashRefreshToken);
+      if (!refTokMatches) return process.env.FORBIDDEN;
+
+      const tokens = await this.getTokens(user.id);
+      await this.updateHashRefreshToken(user.id, tokens.refreshToken);
+
+      return tokens;
+    } catch (error) {
+      return process.env.INTERNAL_SERVER_ERROR;
+    }
   }
 
   async hashData(data: string) {
@@ -98,26 +119,40 @@ export class AuthService {
     return await bcrypt.hash(data, salt);
   }
 
-  async updateHashToken(userId: string, token: string) {
+  async updateHashRefreshToken(userId: string, token: string) {
     const hash = await this.hashData(token);
     await this.prisma.user.update({
       where: { id: userId },
       data: {
-        hashToken: hash,
+        hashRefreshToken: hash,
       },
     });
   }
 
-  async getToken(userId: string): Promise<string> {
-    const token = await this.jwtService.signAsync(
-      {
-        id: userId,
-      },
-      {
-        secret: process.env.JWT_SECRET_KEY,
-        expiresIn: process.env.TOKEN_EXPIRE_TIME,
-      },
-    );
-    return token;
+  async getTokens(userId: string): Promise<Tokens> {
+    const [accTok, refTok] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          id: userId,
+        },
+        {
+          secret: process.env.JWT_SECRET_KEY,
+          expiresIn: process.env.TOKEN_EXPIRE_TIME,
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          id: userId,
+        },
+        {
+          secret: process.env.JWT_SECRET_REFRESH_KEY,
+          expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+        },
+      ),
+    ]);
+    return {
+      accessToken: accTok,
+      refreshToken: refTok,
+    };
   }
 }

@@ -11,9 +11,21 @@ interface UserIdInfo {
   id: string; // string
   id_type: string;
 }
+
 interface Latency {
   latency: string; // string
 }
-interface Token {
-  token: string; // string
+
+interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface JwtPayload {
+  id: string;
+}
+
+interface JwtPayloadWithRt {
+  id: string;
+  refreshToken: string;
 }

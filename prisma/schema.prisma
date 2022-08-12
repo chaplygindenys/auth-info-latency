@@ -11,13 +11,13 @@ datasource db {
 }
 
 model User {
-  id        String  @id @unique
-  hashPsw   String
-  hashToken String?
-  id_type   String
-  version   Int
-  createdAt Int
-  updatedAt Int
+  id               String  @id @unique
+  hashPsw          String
+  hashRefreshToken String?
+  id_type          String
+  version          Int
+  createdAt        Int
+  updatedAt        Int
 
   @@map("users")
 }
