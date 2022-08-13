@@ -1,13 +1,19 @@
-FROM node:lts-alpine3.15 AS builder
+FROM node:lts AS builder
 
 WORKDIR /app
 
 COPY package*.json /app
 COPY prisma ./prisma/
 
+RUN apt-get install gcc
+
+RUN npm install -g node-gyp
+
+
 RUN npm install
 
 COPY . .
+
 
 RUN npm run build
 
