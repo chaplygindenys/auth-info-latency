@@ -13,9 +13,17 @@ API (JSON):
 ⁃ true - removes all users bearer tokens
 ⁃ false - removes only current token
 
+# first step
+
+.env.example rename to .env
+
 ## Installation
 
 ```bash
+
+$ apt-get install gcc
+$ npm install -g node-gyp
+
 $ npm install
 ```
 
