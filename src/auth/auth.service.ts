@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { isEmail, isMobilePhone } from 'class-validator';
 import { Message } from './auth-message';
+import * as argon from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +60,7 @@ export class AuthService {
       if (!passwordMatches) return process.env.FORBIDDEN;
 
       const tokens = await this.getTokens(user.id);
+
       await this.updateHashRefreshToken(user.id, tokens.refreshToken);
 
       return tokens;
@@ -102,7 +104,7 @@ export class AuthService {
       });
       if (!user || !user.hashRefreshToken) return process.env.FORBIDDEN;
 
-      const refTokMatches = await bcrypt.compare(refTok, user.hashRefreshToken);
+      const refTokMatches = await argon.verify(user.hashRefreshToken, refTok);
       if (!refTokMatches) return process.env.FORBIDDEN;
 
       const tokens = await this.getTokens(user.id);
@@ -119,8 +121,12 @@ export class AuthService {
     return await bcrypt.hash(data, salt);
   }
 
+  async hashRefreshToken(token: string) {
+    return await argon.hash(token);
+  }
+
   async updateHashRefreshToken(userId: string, token: string) {
-    const hash = await this.hashData(token);
+    const hash = await this.hashRefreshToken(token);
     await this.prisma.user.update({
       where: { id: userId },
       data: {

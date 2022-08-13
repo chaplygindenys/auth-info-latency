@@ -64,3 +64,9 @@ set body: `{ "id":"+380677777775", "password":"password" }`
 /signin
 set body: `{ "id":"+380677777775", "password":"password" }`
 /refresh set headers : `Authorization : Bearer {{refreshToken}}`
+
+# Watch DB
+
+```bash
+$ npm run prisma:studio
+```
