@@ -13,9 +13,17 @@ API (JSON):
 ⁃ true - removes all users bearer tokens
 ⁃ false - removes only current token
 
+# first step
+
+.env.example rename to .env
+
 ## Installation
 
 ```bash
+
+$ apt-get install gcc
+$ npm install -g node-gyp
+
 $ npm install
 ```
 
@@ -64,3 +72,9 @@ set body: `{ "id":"+380677777775", "password":"password" }`
 /signin
 set body: `{ "id":"+380677777775", "password":"password" }`
 /refresh set headers : `Authorization : Bearer {{refreshToken}}`
+
+# Watch DB
+
+```bash
+$ npm run prisma:studio
+```

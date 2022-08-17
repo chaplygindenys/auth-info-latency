@@ -3,4 +3,5 @@ node_modules
 .idea
 Dockerfile
 pgdata
+pg_data
 .md
