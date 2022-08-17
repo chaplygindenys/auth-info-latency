@@ -16,6 +16,7 @@ export class InfoService {
       });
       return userIdInfo;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }
@@ -56,6 +57,7 @@ export class InfoService {
       const latencyInfo = { latency: pingInfo.avg };
       return latencyInfo;
     } catch (error) {
+      console.log(error);
       console.log(error);
       return null;
     }

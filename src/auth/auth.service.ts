@@ -22,7 +22,7 @@ export class AuthService {
       const type: string = await this.validateTypeId(dto.id);
       if (!type) return process.env.BAD_REQUEST;
 
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findFirst({
         where: { id: dto.id },
       });
       if (user) return process.env.FORBIDDEN;
@@ -41,6 +41,7 @@ export class AuthService {
 
       return Message.AUTH_MESSAGE;
     } catch (error) {
+      console.log(error);
       return process.env.INTERNAL_SERVER_ERROR;
     }
   }
@@ -63,6 +64,7 @@ export class AuthService {
 
       return tokens;
     } catch (error) {
+      console.log(error);
       if (error.message === process.env.FORBIDDEN) return process.env.FORBIDDEN;
       return process.env.INTERNAL_SERVER_ERROR;
     }
@@ -110,6 +112,7 @@ export class AuthService {
 
       return tokens;
     } catch (error) {
+      console.log(error);
       return process.env.INTERNAL_SERVER_ERROR;
     }
   }

@@ -25,7 +25,6 @@ interface JwtPayload {
   id: string;
 }
 
-interface JwtPayloadWithRt {
-  id: string;
+interface JwtPayloadWithRt extends JwtPayload {
   refreshToken: string;
 }
