@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { exec } from 'child_process';
 import * as ping from 'ping';
+import { show } from 'src/utils';
 
 @Injectable()
 export class InfoService {
@@ -14,6 +15,7 @@ export class InfoService {
         where: { id: userId },
         select: { id: true, id_type: true },
       });
+      show(userIdInfo);
       return userIdInfo;
     } catch (error) {
       console.log(error);
@@ -40,7 +42,7 @@ export class InfoService {
         );
       });
       const resalt = await lacety;
-
+      show(undefined);
       return resalt;
     } catch (error) {
       console.log(error);
@@ -53,6 +55,7 @@ export class InfoService {
       const promisePingInfo: Promise<ping.PingResponse> = ping.promise.probe(
         process.env.PING_HOST,
       );
+      show(promisePingInfo);
       const pingInfo = await promisePingInfo;
       const latencyInfo = { latency: pingInfo.avg };
       return latencyInfo;
