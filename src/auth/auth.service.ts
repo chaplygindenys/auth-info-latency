@@ -1,16 +1,26 @@
 import 'dotenv/config';
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma/prisma.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from '../schemas/user.schema';
+
 import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { isEmail, isMobilePhone } from 'class-validator';
 import { Message } from './auth-message';
 import * as argon from 'argon2';
+import { show } from 'src/utils';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private prisma: PrismaService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
   async validateTypeId(id: string): Promise<string> {
     if (isEmail(id)) return 'email';
@@ -29,17 +39,22 @@ export class AuthService {
       if (user) return process.env.FORBIDDEN;
 
       const hashPsw = await this.hashData(dto.password);
-      await this.prisma.user.create({
-        data: {
-          id: dto.id,
-          hashPsw,
-          id_type: type,
-          version: 1,
-          createdAt: +Date.now(),
-          updatedAt: +Date.now(),
-        },
-      });
 
+      const newUser = {
+        id: dto.id,
+        hashPsw,
+        id_type: type,
+        version: 1,
+        createdAt: +Date.now(),
+        updatedAt: +Date.now(),
+      };
+      const resaltPrisma = await this.prisma.user.create({
+        data: newUser,
+      });
+      const createdUser = new this.userModel(newUser);
+      const resaltMongoose = await createdUser.save();
+      show(resaltMongoose);
+      show(resaltPrisma);
       return Message.AUTH_MESSAGE;
     } catch (error) {
       console.log(error);
